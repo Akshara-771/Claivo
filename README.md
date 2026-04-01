@@ -86,7 +86,6 @@ Create a `.env` file in the root directory and add:
 GROQ_API_KEY=your_groq_api_key
 AWS_ACCESS_KEY_ID=your_key
 AWS_SECRET_ACCESS_KEY=your_secret
-AWS_REGION=your_region
 GOOGLE_APPLICATION_CREDENTIALS=backend/gcp_key.json
 ```
 
