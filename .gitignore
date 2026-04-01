@@ -1,0 +1,20 @@
+# Secrets
+.env
+*.env
+
+# GCP
+gcp_key.json
+backend/gcp_key.json
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# Databases / embeddings
+backend/chroma_db/
