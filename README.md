@@ -63,14 +63,26 @@ Clairvo automates the auditing process by simultaneously **analyzing expense rec
 
 Ensure you have the following installed:
 
-- Python 3.10+
-- Node.js
+- Python 3.10+  
+- Node.js  
+- AWS CLI  
 
 ---
 
-### 2. Installation
+### 2. AWS Configuration
 
-Clone the repository and install dependencies:
+Clairvo uses boto3 to interact with S3 and DynamoDB. Before running the application, ensure your local environment is authenticated:
+
+```bash
+aws configure
+# Enter your AWS Access Key, Secret Key, and Region 
+```
+
+---
+
+### 3. Installation
+
+Clone the repository and install the required Python dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -78,20 +90,20 @@ pip install -r requirements.txt
 
 ---
 
-### 3. Environment Configuration
+### 4. Environment Configuration
 
-Create a `.env` file in the root directory and add:
+Create a `.env` file in the root directory to store your LLM and OCR credentials:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
-AWS_ACCESS_KEY_ID=your_key
-AWS_SECRET_ACCESS_KEY=your_secret
 GOOGLE_APPLICATION_CREDENTIALS=backend/gcp_key.json
 ```
 
+**Note:** AWS credentials are automatically sourced from your local AWS profile via Boto3.
+
 ---
 
-### 4. Running the Project Locally
+### 5. Running the Project Locally
 
 #### Start the FastAPI Backend
 
@@ -109,9 +121,7 @@ npm start
 
 ### Access the Application
 
-Open your browser and navigate to:
-
-http://localhost:3000
+Open your browser and navigate to: http://localhost:3000
 
 ---
 
