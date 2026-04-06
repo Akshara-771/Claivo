@@ -18,3 +18,4 @@ __pycache__/
 
 # Databases / embeddings
 backend/chroma_db/
+

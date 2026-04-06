@@ -10,8 +10,8 @@ def contains_keywords(text, keywords):
             return True
     return False
 
-def extract_fields(text):
-    print("EXTRACTOR VERSION: NEW")
+def extract_fields(text, category=None):
+    print("EXTRACTOR VERSION: NEW (Category Aware)")
     data = {
         "merchant": None,
         "date": None,
@@ -34,65 +34,63 @@ def extract_fields(text):
                 break
 
     # -------- 2. Date (multiple formats) --------
-    # Manual month map avoids locale issues on Windows
     MONTH_MAP = {
         "january": "01", "february": "02", "march": "03",
         "april": "04", "may": "05", "june": "06",
         "july": "07", "august": "08", "september": "09",
-        "october": "10", "november": "11", "december": "12"
+        "october": "10", "november": "11", "december": "12",
+        "jan": "01", "feb": "02", "mar": "03", "apr": "04",
+        "jun": "06", "jul": "07", "aug": "08", "sep": "09",
+        "oct": "10", "nov": "11", "dec": "12"
     }
-
-
-    # Try DD Month YYYY (Modified to handle trailing punctuation)
-    # -------- 2. Date (multiple formats) --------
-    MONTH_MAP = {
-        "january": "01", "february": "02", "march": "03",
-        "april": "04", "may": "05", "june": "06",
-        "july": "07", "august": "08", "september": "09",
-        "october": "10", "november": "11", "december": "12"
-    }
-
-    # 1. Create a regex-friendly list of months
     month_pattern = "|".join(MONTH_MAP.keys())
+    
+    extracted_dates = []
 
-    # 2. Strict Anchor Regex: (Day) (Space) (Specific Month Name) (Space) (Year)
-    # This forces the middle group to be a month name, preventing it from grabbing "singapore"
-    match = re.search(fr'(\d{{1,2}})\s+({month_pattern})\s+(\d{{4}})', text, re.IGNORECASE)
-
-    if match:
+    # Format A: DD Month YYYY
+    for match in re.finditer(fr'(\d{{1,2}})\s+({month_pattern})\s+(\d{{4}})', text, re.IGNORECASE):
         day = match.group(1).zfill(2)
         month_word = match.group(2).lower()
         year = match.group(3)
-        data["date"] = f"{year}-{MONTH_MAP[month_word]}-{day}"
-        print(f"DATE MATCHED: {data['date']}")
-    else:
-        # 3. Emergency Fallback: If the OCR put a dot or weird char after the year
-        # This specifically looks for 'March 2025' and works backwards
-        fallback = re.search(fr'({month_pattern})\s+(\d{{4}})', text, re.IGNORECASE)
-        if fallback:
-            month_word = fallback.group(1).lower()
-            year = fallback.group(2)
-            # Look for the digits immediately preceding the month
-            day_match = re.search(r'(\d{1,2})\s+' + re.escape(fallback.group(1)), text, re.IGNORECASE)
-            day = day_match.group(1).zfill(2) if day_match else "01"
-            data["date"] = f"{year}-{MONTH_MAP[month_word]}-{day}"
+        extracted_dates.append(f"{year}-{MONTH_MAP[month_word]}-{day}")
 
-    # Try YYYY-MM-DD if still None
-    if not data["date"]:
-        match = re.search(r'(\d{4}-\d{2}-\d{2})', text)
-        if match:
-            data["date"] = match.group(1)
+    # Format B: Month YYYY with preceding day (Fallback)
+    for fallback in re.finditer(fr'({month_pattern})\s+(\d{{4}})', text, re.IGNORECASE):
+        month_word = fallback.group(1).lower()
+        year = fallback.group(2)
+        day_match = re.search(r'(\d{1,2})\s+' + re.escape(fallback.group(1)), text, re.IGNORECASE)
+        day = day_match.group(1).zfill(2) if day_match else "01"
+        extracted_dates.append(f"{year}-{MONTH_MAP[month_word]}-{day}")
 
-    # Try DD/MM/YYYY if still None
-    if not data["date"]:
-        idx = text.find("2025")
-        if idx > 0:
-            snippet = text[idx-15:idx+10]
-            print("RAW AROUND DATE:", repr(snippet))
-        match = re.search(r'(\d{1,2})/(\d{1,2})/(\d{4})', text)
-        print("DATE REGEX MATCH:", match.group(0) if match else "NO MATCH")
-        if match:
-            data["date"] = f"{match.group(3)}-{match.group(2).zfill(2)}-{match.group(1).zfill(2)}"
+    # Format C: YYYY-MM-DD
+    for match in re.finditer(r'(\d{4}-\d{2}-\d{2})', text):
+        extracted_dates.append(match.group(1))
+
+    # Format D: DD/MM/YYYY
+    for match in re.finditer(r'(\d{1,2})/(\d{1,2})/(\d{4})', text):
+        extracted_dates.append(f"{match.group(3)}-{match.group(2).zfill(2)}-{match.group(1).zfill(2)}")
+
+    # Deduplicate and validate dates
+    valid_dates = []
+    for d_str in set(extracted_dates):
+        try:
+            # Quick check if it's a real date
+            datetime.strptime(d_str, "%Y-%m-%d")
+            valid_dates.append(d_str)
+        except ValueError:
+            pass
+
+    if valid_dates:
+        valid_dates.sort()
+        # For flights and hotels, take the max date (checkout/return)
+        if category and category.lower() in ["air travel", "accommodation"]:
+            data["date"] = valid_dates[-1] 
+        else:
+            # Normal logic: just take the earliest / first parsed (or could just take valid_dates[0], but let's take the latest fallback to avoid print dates from months ago)
+            # Alternatively, original logic just took the first match. Because valid_dates is sorted, valid_dates[0] is the earliest. 
+            data["date"] = valid_dates[0]
+            
+        print(f"EXTRACTED DATES: {valid_dates} -> CHOSEN: {data['date']}")
 
     # -------- 3. Currency --------
     if "SGD" in text:
@@ -144,5 +142,21 @@ def extract_fields(text):
                 continue
         if cleaned:
             data["total_amount"] = max(cleaned)
+    # -------- 5. Nights (for Accommodation) --------
+    data["nights"] = 1  # Default to 1 to avoid division by zero
+    
+    # Look for "X nights" or "X night" or "Night(s): X"
+    nights_match = re.search(r'(\d+)\s*night', text, re.IGNORECASE)
+    if nights_match:
+        data["nights"] = int(nights_match.group(1))
+    else:
+        # Fallback: check for common hotel date ranges (e.g., 10-13 March)
+        # For Receipt 10 specifically, it says "March 10-13, 2025"
+        date_range = re.search(r'(\d{1,2})-(\d{1,2})\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)', text, re.IGNORECASE)
+        if date_range:
+            start, end = int(date_range.group(1)), int(date_range.group(2))
+            data["nights"] = max(1, end - start)
+
+    
 
     return data

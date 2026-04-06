@@ -1,13 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+:root {
+  --bg-color: #ffffff;
+  --text-main: #000000;
+  --text-muted: #666666;
+  --border-color: #222222;
+  --accent-color: #000000;
+  
+  --status-green: #2ecc71;
+  --status-yellow: #f39c12;
+  --status-red: #e74c3c;
+  
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-color);
+  color: var(--text-main);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Typography Utility */
+.heading-mega {
+  font-size: 5rem;
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin-bottom: 2rem;
+}
+
+.heading-section {
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: -1px;
+  margin-bottom: 1.5rem;
+}
+
+/* Form Styles - Minimalist Bottom Borders */
+.minimal-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+  padding: 10px 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  background: transparent;
+  color: var(--text-main);
+  transition: border-color 0.3s ease;
+  outline: none;
+  margin-bottom: 1.5rem;
+}
+
+.minimal-input:focus {
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.minimal-button {
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 30px; /* rounded minimalist button */
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.minimal-button:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+}
+
+.minimal-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Table Minimalist */
+.minimal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+}
+
+.minimal-table th, .minimal-table td {
+  padding: 1.2rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.minimal-table th {
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.minimal-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Traffic Light Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.badge::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.badge.green { background: rgba(46, 204, 113, 0.1); color: var(--status-green); }
+.badge.green::before { background: var(--status-green); }
+
+.badge.yellow { background: rgba(243, 156, 18, 0.1); color: var(--status-yellow); }
+.badge.yellow::before { background: var(--status-yellow); }
+
+.badge.red { background: rgba(231, 76, 60, 0.1); color: var(--status-red); }
+.badge.red::before { background: var(--status-red); }
+
+/* Animation Utils */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scanning Animation Overlay */
+.scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-color);
+  animation: scan 2s infinite ease-in-out;
+  box-shadow: 0 0 10px var(--accent-color);
+  z-index: 10;
+}
+
+@keyframes scan {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Evidence Grid */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.evidence-pane {
+  background: #fdfdfd;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Nav */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 3rem;
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.nav-link {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  margin-left: 2rem;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--text-muted);
 }
