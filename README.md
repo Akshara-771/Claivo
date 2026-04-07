@@ -6,10 +6,6 @@ An AI-powered expense auditing system that uses RAG and a deterministic rule eng
 
 ## Project Demonstration
 
-### Project Demo
-
-A modern audit interface for expense review, policy validation, and decision tracking.
-
 ### Screenshots
 
 📸 Example screens
@@ -36,19 +32,19 @@ Without a reliable audit process that tracks findings back to source data and po
 
 Claivo is an expense intelligence platform that converts receipt images into structured, auditable decisions. It combines OCR, retrieval-driven policy validation, and deterministic rules to ensure every approval, flag, or rejection is clear and defensible.
 
-Core philosophy: traceable AI.
+**Core philosophy: traceable AI.**
 
 Claivo is designed so that every recommendation is supported by evidence:
 
-- Minimized hallucination: audit conclusions are grounded in OCR-extracted receipt data and policy context
-- Audit-ready findings: results include rule references, computed math, and rationale
-- Verifiable controls: duplicate detection, currency conversion, and grade-based policy validation are explicit and reproducible
+- **Minimized hallucination**: audit conclusions are grounded in OCR-extracted receipt data and policy context
+- **Audit-ready findings**: results include rule references, computed math, and rationale
+- **Verifiable controls**: duplicate detection, currency conversion, and grade-based policy validation are explicit and reproducible
 
 ---
 
 ## Key Features & Technical Implementation
 
-1. Receipt ingestion and OCR
+1. **Receipt ingestion and OCR**
    - Feature: Accept receipt images and PDFs for automated analysis.
    - Implementation:
      - FastAPI handles uploads and API orchestration.
@@ -56,37 +52,37 @@ Claivo is designed so that every recommendation is supported by evidence:
      - PyMuPDF converts PDF pages to images for OCR processing.
 
 2. Expense extraction and normalization
-   - Feature: Parse merchant, date, amount, currency, and category from raw receipt text.
+   **Expense extraction and normalization**unt, currency, and category from raw receipt text.
    - Implementation:
      - `extractor.py` applies regex-based cleaning and date normalization.
      - `normalize_expense_type` categorizes receipts into meals, accommodation, travel, and general spend.
 
 3. Policy retrieval and validation
-   - Feature: Retrieve relevant policy sections and validate each claim against corporate rules.
+   **Policy retrieval and validation**licy sections and validate each claim against corporate rules.
    - Implementation:
      - ChromaDB stores policy embeddings for similarity search.
      - `rag_pipeline.py` constructs audit prompts based on category and employee grade.
      - Responses include exact math and policy references for transparency.
 
 4. Duplicate detection and fraud prevention
-   - Feature: Identify visually similar receipts and prevent repeated submissions.
+   **Duplicate detection and fraud prevention**eipts and prevent repeated submissions.
    - Implementation:
      - `imagehash` and Pillow generate perceptual fingerprints.
      - DynamoDB scans detect duplicates by visual hash or matching employee/date/amount combinations.
 
-5. Audit decision scoring
+5. **Audit decision scoring**
    - Feature: Rank claims by risk to prioritize finance review.
    - Implementation:
      - `calculate_risk_score()` computes risk using decision state, amount, date flags, and policy source.
      - Claims are surfaced by priority in the auditor interface.
 
-6. Frontend workflow
+6. **Frontend workflow**
    - Feature: Employee submission portal and auditor dashboard for claim management.
    - Implementation:
      - React Router supports `/submit`, `/admin`, and `/audit/:claim_id` routes.
      - UI includes notifications, search/filtering, history tracking, and export tools.
 
-7. Auditor dashboard and analytics
+7. **Auditor dashboard and analytics**
    - Feature: Real-time claim monitoring with analytics and status breakdowns.
    - Implementation:
      - Recharts drives visual summaries of spend categories and claim status.
