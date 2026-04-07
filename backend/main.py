@@ -234,7 +234,8 @@ async def upload_receipt(
 
         # 2. 🔥 NOW you can do the Currency Swap
         # Get amount from OCR, then convert it
-        raw_amount = float(structured_data.get("total_amount", 0))
+        extracted_val = structured_data.get("total_amount")
+        raw_amount = float(extracted_val) if extracted_val is not None else 0.0
         
         # Prefer the OCR-detected currency. If not found, fall back to user_currency.
         final_currency = structured_data.get("currency") or user_currency
