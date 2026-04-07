@@ -1,5 +1,5 @@
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FakeEmbeddings
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import re
@@ -39,7 +39,7 @@ def ingest_new_policy(pdf_path):
     docs = load_policy(pdf_path) 
     
     # 2. Setup the Embedding Model (The math behind the search)
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    embeddings = FakeEmbeddings(size=384)
 
     # 3. Save to ChromaDB
     vector_db = Chroma.from_documents(
@@ -52,7 +52,7 @@ def ingest_new_policy(pdf_path):
 # Add this to rag_pipeline.py
 def create_vector_store(docs):
     """Initializes and persists the vector database from documents."""
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    embeddings = FakeEmbeddings(size=384)
     
     # This creates the 'chroma_db' directory and saves your index
     db = Chroma.from_documents(
@@ -64,7 +64,7 @@ def create_vector_store(docs):
 
 def load_vector_store():
     """Loads the existing vector database for main.py to use."""
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    embeddings = FakeEmbeddings(size=384)
     return Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
 
 def normalize_expense_type(raw_text: str) -> str:
