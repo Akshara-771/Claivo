@@ -1,8 +1,10 @@
 from google.cloud import vision
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # 1. Set the environment variable (using double backslashes for Windows)
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "D:\\FinTech-Expense_Auditor\\backend\\gcp_key.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 def extract_text_from_image(image_bytes):
     try:
