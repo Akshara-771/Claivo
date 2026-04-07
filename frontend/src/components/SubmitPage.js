@@ -39,6 +39,24 @@ export default function SubmitPage() {
   };
 
   const [offset, setOffset] = useState(0);
+  const getNotifiedClaimsKey = () => {
+    const storedName = (localStorage.getItem("demo_employee_name") || "anonymous").trim().toLowerCase();
+    return `demo_notified_claims_${storedName}`;
+  };
+
+  const getNotifiedClaimIds = () => {
+    try {
+      const raw = localStorage.getItem(getNotifiedClaimsKey());
+      const parsed = raw ? JSON.parse(raw) : [];
+      return new Set(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      return new Set();
+    }
+  };
+
+  const saveNotifiedClaimIds = (idSet) => {
+    localStorage.setItem(getNotifiedClaimsKey(), JSON.stringify(Array.from(idSet)));
+  };
 
   const filteredHistory = history.filter(claim => {
     const matchesSearch = (claim.business_purpose || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,13 +119,18 @@ export default function SubmitPage() {
         }
 
         if (initialLoadRef.current) {
+          const notifiedIds = getNotifiedClaimIds();
           filtered.forEach((claim) => {
             const oldClaim = prevHistoryRef.current[claim.claim_id];
-            // Pop a notification only if is_settled switches to true
-            if (oldClaim && !oldClaim.is_settled && claim.is_settled) {
+            // Notify for newly finalized claims, and persist so refresh/reopen doesn't miss it.
+            const becameFinalized = oldClaim && !oldClaim.is_settled && claim.is_settled;
+            const finalizedButUnnotified = claim.is_settled && !notifiedIds.has(claim.claim_id);
+            if (becameFinalized || finalizedButUnnotified) {
               addNotification(`Auditor Decision: Your claim for ${claim.business_purpose} was ${claim.status}!`);
+              notifiedIds.add(claim.claim_id);
             }
           });
+          saveNotifiedClaimIds(notifiedIds);
         }
 
         const newRefMap = {};
