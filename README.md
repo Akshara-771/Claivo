@@ -2,23 +2,27 @@
 
 An AI-powered expense auditing system that uses RAG and a deterministic rule engine to automatically cross-reference digital receipts against complex corporate policies for real-time compliance.
 
+![React](https://img.shields.io/badge/React-18-blue)
+![AWS](https://img.shields.io/badge/AWS-S3%20%7C%20DynamoDB%20%7C%20SES-orange)
+![Render](https://img.shields.io/badge/Render-Backend-purple)
+![Amplify](https://img.shields.io/badge/Amplify-Frontend-orange)
+[![Demo Video](https://img.shields.io/badge/Demo-Video-red)](https://drive.google.com/file/d/1x6vIXfxplxda8AEv0WHh-rRlGmp6K2td/view?usp=drive_link)
+[![Approach Document](https://img.shields.io/badge/Approach-Document-blueviolet)](./APPROACH_DOCUMENT.md)
+
 ---
 
 ## Project Demonstration
 
 ### Screenshots
 
-📸 Example screens
+![Admin Dashboard](./Images/Admin_Dashboard_page.jpg)
+![Audit Details](./Images/Audit_Details_Page.jpg)
+![Claims Admin Dashboard](./Images/Claims_Admin_Dashboard.jpg)
+![Employee Home Page](./Images/Employee_Home_Page.jpg)
+![Employee Submit Form](./Images/Employee_Submit_Form.jpg)
+![Notifications Panel](./Images/Notifications_Page.jpg)
+![Policy Display](./Images/Policy_Display.jpg)
 
-- Claims dashboard overview
-- Audit analytics and risk breakdowns
-- Receipt review and RAG validation flow
-
-### Demo Video
-
-🎥 A short walkthrough video can demonstrate the claim upload flow, live decision validation, and auditor review experience.
-
----
 
 ## 🎯 The Problem
 
