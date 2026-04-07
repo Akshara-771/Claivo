@@ -67,8 +67,14 @@ HOTEL_LIMITS_USD = {
 # Initialize app
 app = FastAPI()
 
-# Load vector DB once
-db = load_vector_store()
+db = None
+
+def get_db():
+    global db
+    if db is None:
+        print("Loading vector DB...")
+        db = load_vector_store()
+    return db
 
 app.add_middleware(
     CORSMiddleware,
@@ -335,7 +341,7 @@ async def upload_receipt(
         # 5. RAG + LLM Execution
         # We increase k=3 to ensure we get the full grade limit table 
         query = f"Section 3 {current_cat} tables and limits for {employee_grade}"
-        policy_context = retrieve_policy(query, db, structured_data)
+        policy_context = retrieve_policy(query, get_db(), structured_data)
         prompt = build_prompt(structured_data, policy_context)
         llm_output = get_llm_response(prompt)
 
@@ -532,10 +538,4 @@ def get_policy_pdf():
 
 @app.on_event("startup")
 async def startup_event():
-    # This runs every time you start your backend server
-    # It ensures the 'Brain' (ChromaDB) matches your PDF
-    from rag_pipeline import ingest_new_policy
-    policy_path = "./policy.pdf"
-    if os.path.exists(policy_path):
-        print("--- Syncing Policy Knowledge Base ---")
-        ingest_new_policy(policy_path)
+    print("Server started successfully 🚀")
