@@ -105,4 +105,8 @@
 <rect x="40" y="930" width="600" height="40" rx="6" stroke-width="0.5" style="fill:var(--color-background-secondary);stroke:var(--color-border-tertiary);fill:rgb(245, 244, 237);stroke:rgba(31, 30, 29, 0.15);color:rgb(0, 0, 0);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 <text x="340" y="950" text-anchor="middle" dominant-baseline="central" style="fill:var(--color-text-secondary);fill:rgb(61, 61, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Blue = frontend   Purple = backend logic   Teal = AWS + storage   Amber = AI / ML</text>
 
+<<<<<<< HEAD
 </svg>
+=======
+</svg>
+>>>>>>> 2293d7c (CSV and PDF format correction)
