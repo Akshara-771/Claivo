@@ -1,15 +1,36 @@
 from google.cloud import vision
+from google.oauth2 import service_account # Added this import
 import os
+import json # Added this import
 from dotenv import load_dotenv
+
 load_dotenv()
 
-# 1. Set the environment variable (using double backslashes for Windows)
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+def get_vision_client():
+    """Helper to initialize client from either a file path or raw JSON string"""
+    creds_env = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    
+    if not creds_env:
+        # Fallback for local if .env is missing
+        return vision.ImageAnnotatorClient()
+
+    try:
+        # Check if the environment variable is a JSON string (starts with {)
+        if creds_env.strip().startswith('{'):
+            info = json.loads(creds_env)
+            credentials = service_account.Credentials.from_service_account_info(info)
+            return vision.ImageAnnotatorClient(credentials=credentials)
+        else:
+            # It's a file path (standard behavior)
+            return vision.ImageAnnotatorClient()
+    except Exception as e:
+        print(f"Credential Initialization Error: {e}")
+        return vision.ImageAnnotatorClient()
 
 def extract_text_from_image(image_bytes):
     try:
-        # 2. No need to pass 'credentials' here; it pulls from os.environ automatically
-        client = vision.ImageAnnotatorClient() 
+        # Use our helper to get the correctly authenticated client
+        client = get_vision_client() 
         
         image = vision.Image(content=image_bytes)
         response = client.text_detection(image=image)
@@ -20,18 +41,15 @@ def extract_text_from_image(image_bytes):
         texts = response.text_annotations
 
         if not texts:
-            # FEATURE 1 REQUIREMENT: Feedback for unreadable receipts
             return "ERROR_UNREADABLE"
 
         full_text = texts[0].description.strip()
         
-        # Simple heuristic: If text is too short, it's likely a bad scan
         if len(full_text) < 10:
             return "ERROR_BLURRY_OR_INCOMPLETE"
 
         return full_text
 
     except Exception as e:
-        # Log the error for the terminal but return a string for the backend logic
         print("OCR ERROR:", str(e))
         return "ERROR_SYSTEM_FAILURE"
