@@ -51,21 +51,21 @@ Claivo is designed so that every recommendation is supported by evidence:
      - Google Cloud Vision extracts receipt text.
      - PyMuPDF converts PDF pages to images for OCR processing.
 
-2. Expense extraction and normalization
-   **Expense extraction and normalization**unt, currency, and category from raw receipt text.
+2. **Expense extraction and normalization**
+   - Feature: Parse merchant, date, amount, currency, and category from raw receipt text.
    - Implementation:
      - `extractor.py` applies regex-based cleaning and date normalization.
      - `normalize_expense_type` categorizes receipts into meals, accommodation, travel, and general spend.
 
-3. Policy retrieval and validation
-   **Policy retrieval and validation**licy sections and validate each claim against corporate rules.
+3. **Policy retrieval and validation**
+   - Feature: Retrieve relevant policy sections and validate each claim against corporate rules.
    - Implementation:
      - ChromaDB stores policy embeddings for similarity search.
      - `rag_pipeline.py` constructs audit prompts based on category and employee grade.
      - Responses include exact math and policy references for transparency.
 
-4. Duplicate detection and fraud prevention
-   **Duplicate detection and fraud prevention**eipts and prevent repeated submissions.
+4. **Duplicate detection and fraud prevention**
+   - Feature: Identify visually similar receipts and prevent repeated submissions.
    - Implementation:
      - `imagehash` and Pillow generate perceptual fingerprints.
      - DynamoDB scans detect duplicates by visual hash or matching employee/date/amount combinations.
@@ -90,7 +90,7 @@ Claivo is designed so that every recommendation is supported by evidence:
 
 ---
 
-## � Policy Configuration
+## Policy Configuration
 
 ### Using Your Own Corporate Policy
 
@@ -137,7 +137,7 @@ For best results, your policy should include:
 
 ---
 
-## �🛠️ Tech Stack
+## 🛠️ Tech Stack
 
 ### Programming Languages
 
