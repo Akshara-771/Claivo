@@ -389,7 +389,8 @@ async def upload_receipt(
             "date": date,
             "employee_grade": employee_grade,
             "status": status,
-            "risk_score": risk_score,
+            "risk_score": int(risk_score),
+            "rule_ref": final_ref,
             "priority": priority,
             "receipt_url": file_url,
             "category": current_cat,
@@ -432,6 +433,7 @@ async def upload_receipt(
             "policy_text_debug": policy_context,
             "rule_ref": decision_data.get("rule_reference"),
             "risk_score": int(risk_score),
+            "rule_ref": final_ref,
             "receipt_url": f"data:image/jpeg;base64,{encoded_image}"
         }
     except Exception as e:
