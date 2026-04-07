@@ -32,23 +32,14 @@ Without a reliable audit process that tracks findings back to source data and po
 
 Claivo is an expense intelligence platform that converts receipt images into structured, auditable decisions. It combines OCR, retrieval-driven policy validation, and deterministic rules to ensure every approval, flag, or rejection is clear and defensible.
 
-<<<<<<< HEAD
+
 **Core philosophy: traceable AI.**
 
 Claivo is designed so that every recommendation is supported by evidence:
 
 - **Minimized hallucination**: audit conclusions are grounded in OCR-extracted receipt data and policy context
 - **Audit-ready findings**: results include rule references, computed math, and rationale
-- **Verifiable controls**: duplicate detection, currency conversion, and grade-based policy validation are explicit and reproducible
-=======
-Core philosophy: traceable AI.
-
-Claivo is designed so that every recommendation is supported by evidence:
-
-- Minimized hallucination: audit conclusions are grounded in OCR-extracted receipt data and policy context
-- Audit-ready findings: results include rule references, computed math, and rationale
-- Verifiable controls: duplicate detection, currency conversion, and grade-based policy validation are explicit and reproducible
->>>>>>> 2293d7c (CSV and PDF format correction)
+- **Verifiable controls**: duplicate detection, currency conversion, and grade-based policy validation are explicit and 
 
 ---
 
@@ -61,62 +52,38 @@ Claivo is designed so that every recommendation is supported by evidence:
      - Google Cloud Vision extracts receipt text.
      - PyMuPDF converts PDF pages to images for OCR processing.
 
-<<<<<<< HEAD
 2. **Expense extraction and normalization**
-=======
-2. Expense extraction and normalization
->>>>>>> 2293d7c (CSV and PDF format correction)
    - Feature: Parse merchant, date, amount, currency, and category from raw receipt text.
    - Implementation:
      - `extractor.py` applies regex-based cleaning and date normalization.
      - `normalize_expense_type` categorizes receipts into meals, accommodation, travel, and general spend.
-
-<<<<<<< HEAD
+   
 3. **Policy retrieval and validation**
-=======
-3. Policy retrieval and validation
->>>>>>> 2293d7c (CSV and PDF format correction)
    - Feature: Retrieve relevant policy sections and validate each claim against corporate rules.
    - Implementation:
      - ChromaDB stores policy embeddings for similarity search.
      - `rag_pipeline.py` constructs audit prompts based on category and employee grade.
      - Responses include exact math and policy references for transparency.
 
-<<<<<<< HEAD
 4. **Duplicate detection and fraud prevention**
-=======
-4. Duplicate detection and fraud prevention
->>>>>>> 2293d7c (CSV and PDF format correction)
    - Feature: Identify visually similar receipts and prevent repeated submissions.
    - Implementation:
      - `imagehash` and Pillow generate perceptual fingerprints.
      - DynamoDB scans detect duplicates by visual hash or matching employee/date/amount combinations.
 
-<<<<<<< HEAD
 5. **Audit decision scoring**
-=======
-5. Audit decision scoring
->>>>>>> 2293d7c (CSV and PDF format correction)
    - Feature: Rank claims by risk to prioritize finance review.
    - Implementation:
      - `calculate_risk_score()` computes risk using decision state, amount, date flags, and policy source.
      - Claims are surfaced by priority in the auditor interface.
 
-<<<<<<< HEAD
 6. **Frontend workflow**
-=======
-6. Frontend workflow
->>>>>>> 2293d7c (CSV and PDF format correction)
    - Feature: Employee submission portal and auditor dashboard for claim management.
    - Implementation:
      - React Router supports `/submit`, `/admin`, and `/audit/:claim_id` routes.
      - UI includes notifications, search/filtering, history tracking, and export tools.
 
-<<<<<<< HEAD
 7. **Auditor dashboard and analytics**
-=======
-7. Auditor dashboard and analytics
->>>>>>> 2293d7c (CSV and PDF format correction)
    - Feature: Real-time claim monitoring with analytics and status breakdowns.
    - Implementation:
      - Recharts drives visual summaries of spend categories and claim status.
@@ -124,11 +91,7 @@ Claivo is designed so that every recommendation is supported by evidence:
 
 ---
 
-<<<<<<< HEAD
 ## Policy Configuration
-=======
-## � Policy Configuration
->>>>>>> 2293d7c (CSV and PDF format correction)
 
 ### Using Your Own Corporate Policy
 
@@ -175,11 +138,8 @@ For best results, your policy should include:
 
 ---
 
-<<<<<<< HEAD
+
 ## 🛠️ Tech Stack
-=======
-## �🛠️ Tech Stack
->>>>>>> 2293d7c (CSV and PDF format correction)
 
 ### Programming Languages
 
