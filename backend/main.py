@@ -45,7 +45,7 @@ ALCOHOL_KEYWORDS = ["wine", "beer", "whisky", "vodka", "gin", "rum", "cocktail",
 PERSONAL_KEYWORDS = ["spa", "massage", "salon", "haircut", "gym", "grooming", "facial", "wellness", "relaxation"]
 # City-Specific Daily Meal Limits from Section 5.2
 CITY_LIMITS = {
-    "New York": {"limit": 75, "currency": "USD"},
+    "New York": {"g1_g3_limit": 75, "g4_g5_limit": 110, "currency": "USD"},
     "San Francisco": {"limit": 80, "currency": "USD"},
     "London": {"limit": 55, "currency": "GBP"},
     "Singapore": {"limit": 70, "currency": "SGD"},
@@ -63,6 +63,18 @@ HOTEL_LIMITS_USD = {
     "G5": 300  # Note: 580 still triggers a flag for G5!
 }
 # -----------------------------
+
+CITY_ALIASES = {
+    "New York": ["new york", "nyc", "manhattan"],
+    "San Francisco": ["san francisco", "sf"],
+    "London": ["london"],
+    "Singapore": ["singapore"],
+    "Dubai": ["dubai"],
+    "Tokyo": ["tokyo"],
+    "Munich": ["munich"],
+    "Frankfurt": ["frankfurt"],
+    "Sydney": ["sydney"]
+}
 
 # Initialize app
 app = FastAPI()
@@ -140,6 +152,23 @@ def calculate_risk_score(decision, date_flag, amount, rule_ref="System", employe
     score = min(score, 100)
     priority = "High" if score >= 70 else "Medium" if score >= 35 else "Low"
     return score, priority
+
+def detect_city(text: str, merchant: str = ""):
+    combined = f"{text} {merchant}".lower()
+    for city, aliases in CITY_ALIASES.items():
+        if any(alias in combined for alias in aliases):
+            return city
+    return None
+
+def get_meal_limit_usd(city: str, employee_grade: str):
+    if not city or city not in CITY_LIMITS:
+        return None
+    city_cfg = CITY_LIMITS[city]
+    if "g1_g3_limit" in city_cfg and "g4_g5_limit" in city_cfg:
+        if employee_grade in ["G1", "G2", "G3"]:
+            return city_cfg["g1_g3_limit"]
+        return city_cfg["g4_g5_limit"]
+    return city_cfg.get("limit")
 
 def get_visual_hash(file_bytes):
     # Convert bytes to an Image object
@@ -326,7 +355,25 @@ async def upload_receipt(
                     "rule_reference": "Section 4.3"
                 }
 
-        # 4.3 Weekend Validation (Discretionary Only)
+        # 4.3 City + Grade meal cap from Section 5.2 (overrides baseline Section 3)
+        if not rule_override and current_cat == "meals":
+            detected_city = detect_city(text, structured_data.get("merchant") or "")
+            city_limit_usd = get_meal_limit_usd(detected_city, employee_grade)
+            if city_limit_usd is not None:
+                if amount_in_usd > city_limit_usd:
+                    rule_override = {
+                        "decision": "Flagged",
+                        "reason": f"The expense exceeds the {detected_city} daily meal limit of {city_limit_usd} USD for {employee_grade} (Section 5.2).",
+                        "rule_reference": "Section 5.2"
+                    }
+                else:
+                    rule_override = {
+                        "decision": "APPROVE",
+                        "reason": f"The expense is within the {detected_city} daily meal limit of {city_limit_usd} USD for {employee_grade} (Section 5.2).",
+                        "rule_reference": "Section 5.2"
+                    }
+
+        # 4.4 Weekend Validation (Discretionary Only)
         if not rule_override:
             discretionary_cats = ["meals", "other", "ground transportation"]
             if current_cat.lower() in discretionary_cats:
@@ -342,7 +389,7 @@ async def upload_receipt(
                             }
                 except: pass
 
-        # --- 4.4 Air Travel Grade Check ---
+        # --- 4.5 Air Travel Grade Check ---
         if not rule_override and current_cat == "air travel":
             # 1. Identify the class from the text
             is_business = contains_keywords(text_lower, ["business", "class c", "business class"])
