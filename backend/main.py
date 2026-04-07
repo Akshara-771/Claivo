@@ -187,17 +187,30 @@ async def upload_receipt(
                 try:
                     # Compute Hamming distance between the two perceptual hex hashes
                     dist = bin(int(db_hash, 16) ^ int(v_hash, 16)).count('1')
-                    if dist <= 5:  # Tolerance tightened to 5. 12 was too greedy and caught identically structured templates (like airline e-tickets)
+                    same_employee = item.get("employee_name") == employee_name
+                    same_submitted_date = item.get("date") == date
+                    # Keep duplicate checks strict: allow global exact-near matches,
+                    # otherwise require employee/date alignment to avoid template false positives.
+                    if dist <= 1 or (dist <= 5 and same_employee and same_submitted_date):
                         duplicate_detected = True
                         break
                 except:
                     continue
 
         if duplicate_detected:
+            dup_reason = "Visual duplicate detected. A very similar receipt has already been submitted."
+            dup_rule_ref = "Duplicate Detector"
+            dup_status = "Rejected"
+            dup_risk_score, dup_priority = calculate_risk_score(
+                dup_status, "MATCH", None, dup_rule_ref, employee_grade
+            )
             return {
                 "message": "Duplicate Detected",
-                "status": "Rejected", 
-                "reason": "Visual Duplicate Detected. A visually identical receipt has already been submitted."
+                "status": dup_status,
+                "reason": dup_reason,
+                "risk_score": int(dup_risk_score),
+                "rule_ref": dup_rule_ref,
+                "priority": dup_priority
             }
         # 4. PROCEED TO S3 AND OCR
         s3.upload_fileobj(io.BytesIO(file_bytes), BUCKET_NAME, file_key)
@@ -224,10 +237,19 @@ async def upload_receipt(
             if (item.get("employee_name") == employee_name and 
                 item.get("date") == date and 
                 item.get("amount") == structured_data.get("total_amount")):
+                dup_reason = "Duplicate detected. A claim for this identical amount and date was already submitted by you."
+                dup_rule_ref = "Duplicate Detector"
+                dup_status = "Rejected"
+                dup_risk_score, dup_priority = calculate_risk_score(
+                    dup_status, "MATCH", structured_data.get("total_amount"), dup_rule_ref, employee_grade
+                )
                 return {
                     "message": "Duplicate Detected",
-                    "status": "Rejected",
-                    "reason": "Duplicate Detected. A claim for this identical amount and date was already submitted by you."
+                    "status": dup_status,
+                    "reason": dup_reason,
+                    "risk_score": int(dup_risk_score),
+                    "rule_ref": dup_rule_ref,
+                    "priority": dup_priority
                 }
 
         
@@ -379,7 +401,14 @@ async def upload_receipt(
             decision_data = {"reason": f"Parsing error: {str(e)}", "rule_reference": "System"}
 
         # 7. Risk Scoring & Persistence
-        risk_score, priority = calculate_risk_score(status, date_flag, structured_data.get("total_amount"), decision_data.get("rule_reference"), employee_grade)
+        final_ref = decision_data.get("rule_reference") or "System"
+        risk_score, priority = calculate_risk_score(
+            status,
+            date_flag,
+            structured_data.get("total_amount"),
+            final_ref,
+            employee_grade
+        )
         
         db_item = {
             "claim_id": claim_id,
