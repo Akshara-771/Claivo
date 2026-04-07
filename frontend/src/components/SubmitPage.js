@@ -20,7 +20,7 @@ export default function SubmitPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
-  
+
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -91,7 +91,7 @@ export default function SubmitPage() {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/claims");
+      const res = await fetch("https://claivo-backend.onrender.com/claims");
       const data = await res.json();
       if (data.claims) {
         let filtered = data.claims;
@@ -99,17 +99,17 @@ export default function SubmitPage() {
         if (storedName) {
           filtered = data.claims.filter(c => c.employee_name === storedName);
         }
-        
+
         if (initialLoadRef.current) {
-           filtered.forEach((claim) => {
-              const oldClaim = prevHistoryRef.current[claim.claim_id];
-              // Pop a notification only if is_settled switches to true
-              if (oldClaim && !oldClaim.is_settled && claim.is_settled) {
-                 addNotification(`Auditor Decision: Your claim for ${claim.business_purpose} was ${claim.status}!`);
-              }
-           });
+          filtered.forEach((claim) => {
+            const oldClaim = prevHistoryRef.current[claim.claim_id];
+            // Pop a notification only if is_settled switches to true
+            if (oldClaim && !oldClaim.is_settled && claim.is_settled) {
+              addNotification(`Auditor Decision: Your claim for ${claim.business_purpose} was ${claim.status}!`);
+            }
+          });
         }
-        
+
         const newRefMap = {};
         filtered.forEach(c => newRefMap[c.claim_id] = c);
         prevHistoryRef.current = newRefMap;
@@ -147,7 +147,7 @@ export default function SubmitPage() {
       setLoading(true);
       setResult(null);
 
-      const res = await fetch("http://127.0.0.1:8000/upload", {
+      const res = await fetch("https://claivo-backend.onrender.com/upload", {
         method: "POST",
         body: formData,
       });
@@ -171,9 +171,9 @@ export default function SubmitPage() {
 
   const handleDeleteClaim = async (claimId) => {
     if (!window.confirm("Are you sure you want to delete this claim?")) return;
-    
+
     try {
-      const res = await fetch(`http://127.0.0.1:8000/claims/${claimId}`, {
+      const res = await fetch(`https://claivo-backend.onrender.com/claims/${claimId}`, {
         method: "DELETE"
       });
       if (res.ok) {
@@ -190,7 +190,7 @@ export default function SubmitPage() {
   return (
     <div>
       {/* FLOATING NOTIFICATION BUTTON */}
-      <button 
+      <button
         onClick={() => setIsDrawerOpen(true)}
         style={{
           position: 'fixed', right: '1rem', bottom: '1rem', zIndex: 9998,
@@ -210,14 +210,14 @@ export default function SubmitPage() {
 
       {/* OUTSIDE CLICK OVERLAY */}
       {isDrawerOpen && (
-        <div 
+        <div
           onClick={() => setIsDrawerOpen(false)}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9998 }}
         />
       )}
 
       {/* NOTIFICATION DRAWER */}
-      <div 
+      <div
         style={{
           position: 'fixed', top: 0, right: 0, width: '350px', height: '100vh', zIndex: 9999,
           background: 'var(--glass-bg)', backdropFilter: 'blur(16px)', borderLeft: '1px solid var(--glass-border)',
@@ -232,13 +232,13 @@ export default function SubmitPage() {
             <X size={20} />
           </button>
         </div>
-        
+
         <div style={{ padding: '24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {notifications.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', textAlign: 'center', marginTop: '2rem' }}>No new notifications</div>
           ) : (
             notifications.map((t) => (
-              <div key={t.id} style={{ 
+              <div key={t.id} style={{
                 background: '#fff', padding: '16px', borderRadius: '8px', border: '1px solid var(--glass-border)',
                 display: 'flex', flexDirection: 'column', gap: '8px'
               }}>
@@ -537,7 +537,7 @@ export default function SubmitPage() {
                     {c.status !== "Approved" && (
                       <div style={{ fontSize: '0.8rem', color: '#666', fontWeight: 400, marginTop: '4px' }}>
                         Reason: {(() => {
-                           try { return JSON.parse(c.ai_details || "{}").reason || ""; } catch { return ""; }
+                          try { return JSON.parse(c.ai_details || "{}").reason || ""; } catch { return ""; }
                         })()}
                       </div>
                     )}
@@ -551,14 +551,14 @@ export default function SubmitPage() {
                   <td>{c.amount ? `${c.amount} ${c.currency || 'USD'}` : '-'}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <StatusIcon status={c.status} /> 
+                      <StatusIcon status={c.status} />
                       {c.is_settled ? `Finalized - ${c.status}` : c.status === "Approved" ? "Auto-Approved" : `Pending Auditor Review - ${c.status}`}
                     </div>
                   </td>
                   <td>
                     {!c.is_settled && (
-                      <button 
-                        onClick={() => handleDeleteClaim(c.claim_id)} 
+                      <button
+                        onClick={() => handleDeleteClaim(c.claim_id)}
                         style={{ background: 'none', border: 'none', color: 'var(--status-red)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                         title="Delete Claim"
                       >

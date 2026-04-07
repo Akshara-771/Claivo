@@ -51,7 +51,7 @@ export default function AdminPage() {
   };
 
   const loadClaims = () => {
-    fetch("http://127.0.0.1:8000/claims")
+    fetch("https://claivo-backend.onrender.com/claims")
       .then(res => res.json())
       .then(data => {
         if (data.claims) {
@@ -149,7 +149,7 @@ export default function AdminPage() {
       const ai = JSON.parse(c.ai_details || "{}");
       // Hide Date Matcher claims from auditor's 'Action Required' queue
       if (ai.rule_reference === "Date Matcher") return false;
-    } catch (e) {}
+    } catch (e) { }
     return true;
   });
   const finalizedClaims = claims.filter((c) => c.is_settled);
@@ -202,7 +202,7 @@ export default function AdminPage() {
     try {
       await Promise.all(
         Array.from(selectedClaims).map(id =>
-          fetch(`http://127.0.0.1:8000/claims/${id}/decision`, {
+          fetch(`https://claivo-backend.onrender.com/claims/${id}/decision`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ decision, reason })
@@ -255,7 +255,7 @@ export default function AdminPage() {
       {/* TOAST OVERLAY */}
       <div style={{ position: 'fixed', top: '2rem', right: '2rem', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {toasts.map((t) => (
-          <div key={t.id} style={{ 
+          <div key={t.id} style={{
             background: '#000', color: '#fff', padding: '1rem 1.5rem', borderRadius: '8px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: '300px',
             boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontSize: '0.9rem', fontWeight: 600,
@@ -295,7 +295,7 @@ export default function AdminPage() {
 
       <div className="stagger-3" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', marginBottom: '4rem' }}>
         {/* COLUMN 1: SPENDING BY CATEGORY */}
-        <div className="card" style={{ 
+        <div className="card" style={{
           padding: '2rem', backgroundColor: '#fff', border: '1px solid var(--glass-border)', borderRadius: '12px',
           opacity: claims.length ? 1 : 0,
           transform: claims.length ? "translateY(0)" : "translateY(20px)",
@@ -316,7 +316,7 @@ export default function AdminPage() {
         </div>
 
         {/* COLUMN 2: AUDIT OUTCOMES */}
-        <div className="card" style={{ 
+        <div className="card" style={{
           padding: '2rem', backgroundColor: '#fff', border: '1px solid var(--glass-border)', borderRadius: '12px',
           opacity: claims.length ? 1 : 0,
           transform: claims.length ? "translateY(0)" : "translateY(20px)",
@@ -348,204 +348,204 @@ export default function AdminPage() {
       {/* TABS & LOWER TABLE AREA */}
       <div className="stagger-4">
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-        <button
-          onClick={() => setActiveTab("pending")}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '1.1rem',
-            fontWeight: activeTab === "pending" ? 800 : 600,
-            color: activeTab === "pending" ? '#000' : '#aaa',
-            cursor: 'pointer',
-            borderBottom: activeTab === "pending" ? '2px solid #000' : 'none',
-            paddingBottom: '5px'
-          }}
-        >
-          Action Required ({pendingClaims.length})
-        </button>
-        <button
-          onClick={() => setActiveTab("finalized")}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '1.1rem',
-            fontWeight: activeTab === "finalized" ? 800 : 600,
-            color: activeTab === "finalized" ? '#000' : '#aaa',
-            cursor: 'pointer',
-            borderBottom: activeTab === "finalized" ? '2px solid #000' : 'none',
-            paddingBottom: '5px'
-          }}
-        >
-          Finalized ({finalizedClaims.length})
-        </button>
-      </div>
-
-      {/* FILTER & SEARCH BAR */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '2rem', backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: '250px' }}>
-          <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
-          <input
-            type="text"
-            placeholder="Search purpose or employee..."
-            className="minimal-input"
-            style={{ paddingLeft: '35px', margin: 0, width: '100%' }}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          <button
+            onClick={() => setActiveTab("pending")}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '1.1rem',
+              fontWeight: activeTab === "pending" ? 800 : 600,
+              color: activeTab === "pending" ? '#000' : '#aaa',
+              cursor: 'pointer',
+              borderBottom: activeTab === "pending" ? '2px solid #000' : 'none',
+              paddingBottom: '5px'
+            }}
+          >
+            Action Required ({pendingClaims.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("finalized")}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '1.1rem',
+              fontWeight: activeTab === "finalized" ? 800 : 600,
+              color: activeTab === "finalized" ? '#000' : '#aaa',
+              cursor: 'pointer',
+              borderBottom: activeTab === "finalized" ? '2px solid #000' : 'none',
+              paddingBottom: '5px'
+            }}
+          >
+            Finalized ({finalizedClaims.length})
+          </button>
         </div>
 
-        <select className="minimal-input" style={{ margin: 0, width: '150px' }} onChange={(e) => setStatusFilter(e.target.value)}>
-          <option value="All">All Status</option>
-          <option value="Approved">Approved</option>
-          <option value="Flagged">Flagged</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-
-        <select className="minimal-input" style={{ margin: 0, width: '150px' }} onChange={(e) => setGradeFilter(e.target.value)}>
-          <option value="All">All Grades</option>
-          <option value="G1">G1</option>
-          <option value="G2">G2</option>
-          <option value="G3">G3</option>
-          <option value="G4">G4</option>
-          <option value="G5">G5</option>
-        </select>
-
-        <select className="minimal-input" style={{ margin: 0, width: '150px' }} onChange={(e) => setCategoryFilter(e.target.value)}>
-          <option value="All">All Categories</option>
-          <option value="accommodation">Accommodation</option>
-          <option value="meals">Meals</option>
-          <option value="air travel">Air Travel</option>
-          <option value="ground transportation">Transportation</option>
-          <option value="other">Other</option>
-        </select>
-
-        <input
-          type="date"
-          className="minimal-input"
-          style={{ margin: 0, width: '150px' }}
-          onChange={(e) => setDateFilter(e.target.value)}
-        />
-        <select
-          className="minimal-input"
-          style={{ margin: 0, width: '160px' }}
-          onChange={(e) => setSortBy(e.target.value)}
-          value={sortBy}
-        >
-          <option value="risk_high">Risk (High to Low)</option>
-          <option value="risk_low">Risk (Low to High)</option>
-          <option value="latest">Latest First</option>
-          <option value="oldest">Oldest First</option>
-        </select>
-      </div>
-
-      {/* BULK ACTIONS BAR */}
-      {selectedClaims.size > 0 && (
-        <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '8px', padding: '1rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 600, color: '#0369a1' }}>{selectedClaims.size} claims selected</span>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              className="minimal-button"
-              style={{ backgroundColor: '#fff', color: '#000', border: '1px solid #ddd' }}
-              onClick={exportToCSV}
-            >
-              Export Batch (CSV)
-            </button>
-            {activeTab === "pending" && (
-              <>
-                <button
-                  className="minimal-button"
-                  style={{ backgroundColor: 'var(--status-green)' }}
-                  onClick={() => handleBulkAction("Approved")}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Processing..." : "Bulk Approve"}
-                </button>
-                <button
-                  className="minimal-button"
-                  style={{ backgroundColor: 'var(--status-red)' }}
-                  onClick={() => handleBulkAction("Rejected")}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Processing..." : "Bulk Reject"}
-                </button>
-              </>
-            )}
+        {/* FILTER & SEARCH BAR */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '2rem', backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '250px' }}>
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
+            <input
+              type="text"
+              placeholder="Search purpose or employee..."
+              className="minimal-input"
+              style={{ paddingLeft: '35px', margin: 0, width: '100%' }}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
+
+          <select className="minimal-input" style={{ margin: 0, width: '150px' }} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="All">All Status</option>
+            <option value="Approved">Approved</option>
+            <option value="Flagged">Flagged</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+
+          <select className="minimal-input" style={{ margin: 0, width: '150px' }} onChange={(e) => setGradeFilter(e.target.value)}>
+            <option value="All">All Grades</option>
+            <option value="G1">G1</option>
+            <option value="G2">G2</option>
+            <option value="G3">G3</option>
+            <option value="G4">G4</option>
+            <option value="G5">G5</option>
+          </select>
+
+          <select className="minimal-input" style={{ margin: 0, width: '150px' }} onChange={(e) => setCategoryFilter(e.target.value)}>
+            <option value="All">All Categories</option>
+            <option value="accommodation">Accommodation</option>
+            <option value="meals">Meals</option>
+            <option value="air travel">Air Travel</option>
+            <option value="ground transportation">Transportation</option>
+            <option value="other">Other</option>
+          </select>
+
+          <input
+            type="date"
+            className="minimal-input"
+            style={{ margin: 0, width: '150px' }}
+            onChange={(e) => setDateFilter(e.target.value)}
+          />
+          <select
+            className="minimal-input"
+            style={{ margin: 0, width: '160px' }}
+            onChange={(e) => setSortBy(e.target.value)}
+            value={sortBy}
+          >
+            <option value="risk_high">Risk (High to Low)</option>
+            <option value="risk_low">Risk (Low to High)</option>
+            <option value="latest">Latest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
         </div>
-      )}
-      {/* MASTER TABLE */}
-      <div style={{ backgroundColor: '#fff', border: '1px solid var(--glass-border)', borderRadius: '8px', overflow: 'hidden' }}>
-        <table className="minimal-table" style={{ margin: 0 }}>
-          <thead style={{ backgroundColor: '#fafafa' }}>
-            <tr>
-              <th style={{ width: '40px' }}>
-                <input type="checkbox" onChange={handleSelectAll} checked={displayedClaims.length > 0 && selectedClaims.size === displayedClaims.length} />
-              </th>
-              <th>Employee</th>
-              <th>Date</th>
-              <th>Category</th>
-              <th>Amount</th>
-              <th>Risk Score</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayedClaims.map((claim) => (
-              <tr key={claim.claim_id}>
-                <td>
-                  <input type="checkbox" checked={selectedClaims.has(claim.claim_id)} onChange={() => handleToggleSelect(claim.claim_id)} />
-                </td>
-                <td style={{ fontWeight: 600 }}>{claim.employee_name} <span style={{ fontSize: '0.8rem', color: '#999', marginLeft: '5px' }}>{claim.employee_grade}</span></td>
-                <td>{claim.date}</td>
-                <td style={{ textTransform: 'capitalize' }}>{claim.category}</td>
-                <td>
-                  <div style={{ fontWeight: 600 }}>
-                    {claim.amount} {claim.currency}
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: '#888' }}>
-                    ≈ ${claim.total_amount_usd} USD
-                  </div>
-                </td>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '50px', height: '6px', backgroundColor: '#eee', borderRadius: '3px' }}>
-                      <div style={{
-                        height: '100%',
-                        width: `${claim.risk_score}%`,
-                        backgroundColor: claim.risk_score >= 70 ? 'var(--status-red)' : claim.risk_score >= 35 ? 'var(--status-yellow)' : 'var(--status-green)',
-                        borderRadius: '3px'
-                      }}></div>
-                    </div>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{claim.risk_score}/100</span>
-                  </div>
-                </td>
-                <td>
-                  <span className={`badge ${badgeClass(claim.status)}`}>{claim.status}</span>
-                </td>
-                <td>
-                  <Link to={`/audit/${claim.claim_id}`} style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem' }}>
-                    {activeTab === "pending" ? "Review \u2192" : "View Details \u2192"}
-                  </Link>
-                </td>
-              </tr>
-            ))}
-            {displayedClaims.length === 0 && (
+
+        {/* BULK ACTIONS BAR */}
+        {selectedClaims.size > 0 && (
+          <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '8px', padding: '1rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontWeight: 600, color: '#0369a1' }}>{selectedClaims.size} claims selected</span>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                className="minimal-button"
+                style={{ backgroundColor: '#fff', color: '#000', border: '1px solid #ddd' }}
+                onClick={exportToCSV}
+              >
+                Export Batch (CSV)
+              </button>
+              {activeTab === "pending" && (
+                <>
+                  <button
+                    className="minimal-button"
+                    style={{ backgroundColor: 'var(--status-green)' }}
+                    onClick={() => handleBulkAction("Approved")}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Processing..." : "Bulk Approve"}
+                  </button>
+                  <button
+                    className="minimal-button"
+                    style={{ backgroundColor: 'var(--status-red)' }}
+                    onClick={() => handleBulkAction("Rejected")}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Processing..." : "Bulk Reject"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        {/* MASTER TABLE */}
+        <div style={{ backgroundColor: '#fff', border: '1px solid var(--glass-border)', borderRadius: '8px', overflow: 'hidden' }}>
+          <table className="minimal-table" style={{ margin: 0 }}>
+            <thead style={{ backgroundColor: '#fafafa' }}>
               <tr>
-                <td colSpan="8" style={{ textAlign: 'center', padding: '3rem' }}>
-                  <div style={{ textAlign: "center", padding: "3rem" }}>
-                    <p style={{ fontSize: "1rem", color: "#999" }}>
-                      No matching claims
-                    </p>
-                    <p style={{ fontSize: "0.85rem", color: "#bbb" }}>
-                      Try adjusting filters or search terms
-                    </p>
-                  </div>
-                </td>
+                <th style={{ width: '40px' }}>
+                  <input type="checkbox" onChange={handleSelectAll} checked={displayedClaims.length > 0 && selectedClaims.size === displayedClaims.length} />
+                </th>
+                <th>Employee</th>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Risk Score</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {displayedClaims.map((claim) => (
+                <tr key={claim.claim_id}>
+                  <td>
+                    <input type="checkbox" checked={selectedClaims.has(claim.claim_id)} onChange={() => handleToggleSelect(claim.claim_id)} />
+                  </td>
+                  <td style={{ fontWeight: 600 }}>{claim.employee_name} <span style={{ fontSize: '0.8rem', color: '#999', marginLeft: '5px' }}>{claim.employee_grade}</span></td>
+                  <td>{claim.date}</td>
+                  <td style={{ textTransform: 'capitalize' }}>{claim.category}</td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>
+                      {claim.amount} {claim.currency}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#888' }}>
+                      ≈ ${claim.total_amount_usd} USD
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '50px', height: '6px', backgroundColor: '#eee', borderRadius: '3px' }}>
+                        <div style={{
+                          height: '100%',
+                          width: `${claim.risk_score}%`,
+                          backgroundColor: claim.risk_score >= 70 ? 'var(--status-red)' : claim.risk_score >= 35 ? 'var(--status-yellow)' : 'var(--status-green)',
+                          borderRadius: '3px'
+                        }}></div>
+                      </div>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{claim.risk_score}/100</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`badge ${badgeClass(claim.status)}`}>{claim.status}</span>
+                  </td>
+                  <td>
+                    <Link to={`/audit/${claim.claim_id}`} style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem' }}>
+                      {activeTab === "pending" ? "Review \u2192" : "View Details \u2192"}
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+              {displayedClaims.length === 0 && (
+                <tr>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '3rem' }}>
+                    <div style={{ textAlign: "center", padding: "3rem" }}>
+                      <p style={{ fontSize: "1rem", color: "#999" }}>
+                        No matching claims
+                      </p>
+                      <p style={{ fontSize: "0.85rem", color: "#bbb" }}>
+                        Try adjusting filters or search terms
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* FLOATING VIEW POLICY BUTTON */}

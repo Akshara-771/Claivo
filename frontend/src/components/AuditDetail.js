@@ -21,7 +21,7 @@ export default function AuditDetail() {
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/claims/${claim_id}`)
+    fetch(`https://claivo-backend.onrender.com/claims/${claim_id}`)
       .then(res => res.json())
       .then(data => {
         setClaim(data);
@@ -41,7 +41,7 @@ export default function AuditDetail() {
 
     setSubmitting(true);
     try {
-      await fetch(`http://127.0.0.1:8000/claims/${claim_id}/decision`, {
+      await fetch(`https://claivo-backend.onrender.com/claims/${claim_id}/decision`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ decision, reason: comment || "Auditor approved." })
