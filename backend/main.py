@@ -77,6 +77,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.get("/")
+def root():
+    return {
+        "message": "Claivo API is running 🚀",
+        "main_endpoint": "/upload",
+        "docs": "/docs"
+    }
 
 def convert_to_usd(amount, from_currency):
     if from_currency == "USD":
