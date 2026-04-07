@@ -1,7 +1,6 @@
 from email.mime import text
 import re
 
-from sqlalchemy import text
 from datetime import datetime
 
 def contains_keywords(text, keywords):

@@ -4,6 +4,14 @@ boto3
 python-multipart
 langchain
 langchain-community
+langchain-chroma
+langchain-text-splitters
 chromadb
 pydantic
 Pillow
+ImageHash
+python-dotenv
+google-cloud-vision
+PyMuPDF
+requests
+groq
