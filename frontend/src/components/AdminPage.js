@@ -24,30 +24,83 @@ export default function AdminPage() {
 
     const claimsToExport = claims.filter(c => selectedClaims.has(c.claim_id));
 
-    // 1. Define CSV Headers
-    const headers = ["Claim ID", "Employee", "Grade", "Date", "Category", "Amount", "Currency", "Status"].join(",");
+    // Export as Excel-compatible HTML table (auto-fits columns and preserves formatting)
+    let htmlContent = `
+    <html xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <head>
+      <meta charset="UTF-8" />
+      <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #4CAF50; color: white; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+      </style>
+    </head>
+    <body>
+      <table>
+        <thead>
+          <tr>
+            <th>Claim ID</th>
+            <th>Employee</th>
+            <th>Grade</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Currency</th>
+            <th>Status</th>
+            <th>Risk Score</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
 
-    // 2. Map Data to Rows
-    const rows = claimsToExport.map(c => [
-      c.claim_id,
-      c.employee_name,
-      c.employee_grade,
-      c.date,
-      c.category,
-      c.amount,
-      c.currency,
-      c.status
-    ].join(",")).join("\n");
+    claimsToExport.forEach(c => {
+      let dateStr = c.date || "";
+      if (dateStr && !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        try {
+          const d = new Date(dateStr);
+          if (!isNaN(d)) {
+            dateStr = d.toISOString().split('T')[0];
+          }
+        } catch (e) {
+          // Keep original
+        }
+      }
 
-    // 3. Trigger Download
-    const blob = new Blob([headers + "\n" + rows], { type: 'text/csv' });
+      htmlContent += `
+        <tr>
+          <td>${c.claim_id || ""}</td>
+          <td>${c.employee_name || ""}</td>
+          <td>${c.employee_grade || ""}</td>
+          <td>${dateStr}</td>
+          <td>${c.category || ""}</td>
+          <td>${c.amount || c.total_amount_usd || ""}</td>
+          <td>${c.currency || ""}</td>
+          <td>${c.status || ""}</td>
+          <td>${c.risk_score || ""}</td>
+          <td>${c.priority || ""}</td>
+        </tr>
+      `;
+    });
+
+    htmlContent += `
+        </tbody>
+      </table>
+    </body>
+    </html>
+    `;
+
+    // Trigger Download as .xls file (Excel web format)
+    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `payroll_batch_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `expense_audit_${new Date().toISOString().split('T')[0]}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   const loadClaims = () => {

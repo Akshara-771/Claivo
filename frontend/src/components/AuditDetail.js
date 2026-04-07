@@ -66,19 +66,107 @@ export default function AuditDetail() {
   };
 
   const handlePrint = () => {
-    // We temporarily hide the 'Back' button and the 'Override' box for a clean PDF
+    // Optimize PDF layout - eliminate excessive whitespace on first page
     const printStyles = document.createElement('style');
     printStyles.innerHTML = `
     @media print {
-      button, textarea, .no-print { display: none !important; }
-      body { background: white !important; padding: 0 !important; }
-      .evidence-grid { display: block !important; }
-      .evidence-pane { page-break-inside: avoid; border: 1px solid #eee; margin-bottom: 20px; }
+      html, body { 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        width: 100% !important; 
+        height: auto !important; 
+      }
+      
+      @page { 
+        margin: 0.3in !important; 
+        size: letter; 
+      }
+      
+      /* Hide interactive elements */
+      button, textarea, .no-print, [class*="override"], [class*="decision"] { 
+        display: none !important; 
+      }
+      
+      /* Main container - eliminate all padding */
+      div[class*="audit-page"], 
+      div[class*="evidence-grid"],
+      div[style*="padding: 2rem 4rem"] {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      /* Reset all elements to minimal spacing */
+      * { 
+        margin: 0 !important; 
+        padding: 0 !important;
+      }
+      
+      /* Specific content container */
+      div[class*="audit-page"] {
+        padding: 0.3in !important;
+      }
+      
+      /* Headers compact */
+      h1, h2, h3, h4, h5, h6 { 
+        margin: 0.3rem 0 0.5rem 0 !important; 
+        padding: 0 !important;
+      }
+      
+      h1 { font-size: 1.4rem !important; }
+      h2 { font-size: 1.1rem !important; }
+      h3 { font-size: 0.95rem !important; }
+      
+      /* Evidence panes - compact spacing */
+      .evidence-pane, 
+      div[style*="evidence-pane"] { 
+        page-break-inside: avoid !important; 
+        border: 1px solid #ddd !important; 
+        margin: 0.5rem 0 !important;
+        padding: 0.5rem !important;
+        background: white !important;
+      }
+      
+      /* Images - ensure proper sizing */
+      img { 
+        max-width: 100% !important; 
+        height: auto !important;
+      }
+      
+      /* Tables compact */
+      table { 
+        width: 100% !important; 
+        border-collapse: collapse !important; 
+        margin: 0.5rem 0 !important;
+        font-size: 0.85rem !important;
+      }
+      
+      th, td { 
+        padding: 4px 6px !important; 
+        border: 1px solid #ddd !important; 
+      }
+      
+      /* Text optimization */
+      p, span, div, li { 
+        font-size: 0.9rem !important; 
+        line-height: 1.3 !important; 
+        margin: 0.25rem 0 !important;
+      }
+      
+      /* Monospace text */
+      code, pre, [style*="monospace"] { 
+        font-size: 0.75rem !important; 
+        line-height: 1.2 !important;
+      }
+      
+      /* Remove all box shadows and decorative elements */
+      * { box-shadow: none !important; }
     }
   `;
     document.head.appendChild(printStyles);
-    window.print();
-    document.head.removeChild(printStyles);
+    setTimeout(() => {
+      window.print();
+      document.head.removeChild(printStyles);
+    }, 100);
   };
 
   if (loading) return <div style={{ padding: '4rem', textAlign: 'center' }}>Loading Evidence...</div>;
@@ -87,22 +175,22 @@ export default function AuditDetail() {
   const aiDetails = claim.ai_details ? JSON.parse(claim.ai_details) : {};
 
   return (
-    <div style={{ padding: '2rem 4rem', maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ padding: '2rem 4rem', maxWidth: '1400px', margin: '0 auto' }} className="audit-page">
       <button
         onClick={() => navigate("/admin")}
-        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2rem', fontWeight: 600 }}
+        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2rem', fontWeight: 600, fontSize: '0.9rem' }}
       >
         <ArrowLeft size={16} /> Back to Control Center
       </button>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 className="heading-section" style={{ margin: 0 }}>Audit Claim: {claim.employee_name}</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <span style={{ fontSize: '1rem', fontWeight: 600 }}>System Status:</span>
-          <span className={`badge ${claim.status === 'Approved' ? 'green' : claim.status === 'Rejected' ? 'red' : 'yellow'}`} style={{ fontSize: '1rem', padding: '8px 16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '2rem', flexWrap: 'wrap' }}>
+        <h1 className="heading-section" style={{ margin: 0, fontSize: '1.8rem' }}>Audit Claim: {claim.employee_name}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexShrink: 0 }}>
+          <span style={{ fontSize: '0.95rem', fontWeight: 600, whiteSpace: 'nowrap' }}>System Status:</span>
+          <span className={`badge ${claim.status === 'Approved' ? 'green' : claim.status === 'Rejected' ? 'red' : 'yellow'}`} style={{ fontSize: '0.95rem', padding: '6px 14px', whiteSpace: 'nowrap' }}>
             {claim.status}
           </span>
-          <button onClick={handlePrint} className="minimal-button" style={{ backgroundColor: '#f0f0f0', color: '#000' }}>
+          <button onClick={handlePrint} className="minimal-button" style={{ backgroundColor: '#f0f0f0', color: '#000', fontSize: '0.9rem', padding: '8px 12px', whiteSpace: 'nowrap' }}>
             Download Audit PDF 📄
           </button>
         </div>
